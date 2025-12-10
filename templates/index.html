@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Welcome to <span class="gradient-text">PlantPal</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Grow virtual plants based on your daily emotions. 
+                        Track your mood, watch your garden flourish! 🌱
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-3">
+                            <i class="bi bi-flower1"></i> Start Growing
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-success btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-animation">
+                    <div class="plant-showcase">
+                        <div class="plant-item" style="animation-delay: 0s;">🌻</div>
+                        <div class="plant-item" style="animation-delay: 0.2s;">🌹</div>
+                        <div class="plant-item" style="animation-delay: 0.4s;">🌵</div>
+                        <div class="plant-item" style="animation-delay: 0.6s;">🌷</div>
+                        <div class="plant-item" style="animation-delay: 0.8s;">🌸</div>
+                        <div class="plant-item" style="animation-delay: 1s;">🌺</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section py-5">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">
+            ✨ Amazing Features
+        </h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🌱</div>
+                    <h3>Virtual Plants</h3>
+                    <p>Choose from a variety of beautiful plants and watch them grow with your positive emotions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Sentiment Analysis</h3>
+                    <p>Advanced AI analyzes your mood entries and affects plant growth based on your emotions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🎙️</div>
+                    <h3>Voice Input</h3>
+                    <p>Speak your feelings! Use voice-to-text to quickly log your daily mood entries.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Mood Insights</h3>
+                    <p>Visualize your emotional journey with beautiful charts and track your well-being over time.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Gamification</h3>
+                    <p>Level up your plants, maintain streaks, and unlock achievements as you continue your journey.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>Care Reminders</h3>
+                    <p>Set reminders to check in with yourself and your virtual garden regularly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Start Your Garden? 🌿</h2>
+        <p class="lead mb-4">Join PlantPal today and transform your emotional well-being into a thriving virtual garden!</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-right-circle"></i> Get Started Free
+        </a>
+    </div>
+</div>
+{% endblock %}

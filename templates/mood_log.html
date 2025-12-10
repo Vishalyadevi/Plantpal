@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Log Mood - PlantPal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="form-card mood-log-card">
+                <div class="form-header">
+                    <div class="plant-avatar">
+                        {% if plant.type == 'sunflower' %}🌻
+                        {% elif plant.type == 'rose' %}🌹
+                        {% elif plant.type == 'cactus' %}🌵
+                        {% elif plant.type == 'tulip' %}🌷
+                        {% elif plant.type == 'cherry_blossom' %}🌸
+                        {% elif plant.type == 'hibiscus' %}🌺
+                        {% elif plant.type == 'lotus' %}🪷
+                        {% else %}🌱
+                        {% endif %}
+                    </div>
+                    <h2>How are you feeling today?</h2>
+                    <p>Share your thoughts with <strong>{{ plant.name }}</strong></p>
+                </div>
+
+                <form method="POST" action="" id="moodLogForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label for="note_text" class="form-label">
+                            <i class="bi bi-chat-heart"></i> Your Mood
+                        </label>
+                        <div class="voice-input-container">
+                            {{ form.note_text(class="form-control mood-textarea", 
+                               placeholder="Type or speak your feelings...", 
+                               rows="6",
+                               id="moodText") }}
+                            <button type="button" class="btn-voice" id="voiceBtn">
+                                <i class="bi bi-mic-fill"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="bi bi-lightbulb"></i> Tip: Be honest about your feelings. 
+                            Your plant grows with positive emotions!
+                        </div>
+                        {% if form.note_text.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.note_text.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mood-suggestions mb-4">
+                        <label class="form-label">Quick Suggestions:</label>
+                        <div class="suggestion-chips">
+                            <button type="button" class="chip" onclick="addSuggestion('I feel happy today because ')">
+                                😊 Happy
+                            </button>
+                            <button type="button" class="chip" onclick="addSuggestion('I am grateful for ')">
+                                🙏 Grateful
+                            </button>
+                            <button type="button" class="chip" onclick="addSuggestion('Today was challenging but ')">
+                                😔 Challenging
+                            </button>
+                            <button type="button" class="chip" onclick="addSuggestion('I accomplished ')">
+                                ✨ Accomplished
+                            </button>
+                            <button type="button" class="chip" onclick="addSuggestion('I am feeling peaceful about ')">
+                                🧘 Peaceful
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send"></i> Submit & Grow Plant
+                        </button>
+                        <a href="{{ url_for('plant_detail', plant_id=plant.id) }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+
+                <div class="mood-info mt-4">
+                    <div class="info-box">
+                        <h6><i class="bi bi-info-circle"></i> How it works:</h6>
+                        <ul>
+                            <li>✅ <strong>Positive moods</strong> give +20 growth points</li>
+                            <li>➖ <strong>Neutral moods</strong> give +5 growth points</li>
+                            <li>🌙 <strong>Negative moods</strong> activate calming mode (no growth)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+<script>
+function addSuggestion(text) {
+    const textarea = document.getElementById('moodText');
+    textarea.value = text;
+    textarea.focus();
+}
+</script>
+{% endblock %}

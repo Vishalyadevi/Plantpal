@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - PlantPal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="welcome-banner mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">🌿 Hello, {{ current_user.username }}!</h1>
+                <p class="mb-0">You have {{ plants|length }} plant(s) in your garden</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="streak-badge">
+                    <div class="streak-icon">🔥</div>
+                    <div>
+                        <div class="streak-number">{{ current_user.streak_days }}</div>
+                        <div class="streak-label">Day Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('add_plant') }}" class="quick-action-card">
+                <div class="qac-icon">🌱</div>
+                <h5>Add Plant</h5>
+                <p>Start a new plant</p>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('insights') }}" class="quick-action-card">
+                <div class="qac-icon">📊</div>
+                <h5>View Insights</h5>
+                <p>Track your moods</p>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="quick-action-card stat-card">
+                <div class="qac-icon">💚</div>
+                <h5>Total Logs</h5>
+                <p class="stat-number">{{ recent_moods|length }}</p>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="quick-action-card stat-card">
+                <div class="qac-icon">⏰</div>
+                <h5>Reminders</h5>
+                <p class="stat-number">{{ reminders|length }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Plants -->
+    <div class="section-header mb-4">
+        <h2><i class="bi bi-flower1"></i> My Garden</h2>
+        <a href="{{ url_for('add_plant') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Plant
+        </a>
+    </div>
+
+    {% if plants %}
+        <div class="row g-4">
+            {% for plant in plants %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="plant-card" onclick="window.location='{{ url_for('plant_detail', plant_id=plant.id) }}'">
+                        <div class="plant-card-header">
+                            <div class="plant-emoji plant-{{ plant.type }}">
+                                {% if plant.type == 'sunflower' %}🌻
+                                {% elif plant.type == 'rose' %}🌹
+                                {% elif plant.type == 'cactus' %}🌵
+                                {% elif plant.type == 'tulip' %}🌷
+                                {% elif plant.type == 'cherry_blossom' %}🌸
+                                {% elif plant.type == 'hibiscus' %}🌺
+                                {% elif plant.type == 'lotus' %}🪷
+                                {% else %}🌱
+                                {% endif %}
+                            </div>
+                            <div class="plant-level">Lv. {{ plant.level }}</div>
+                        </div>
+                        <div class="plant-card-body">
+                            <h4 class="plant-name">{{ plant.name }}</h4>
+                            <div class="plant-progress">
+                                <div class="progress-label">
+                                    <span>Growth Progress</span>
+                                    <span>{{ plant.growth_points }}/100</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ plant.growth_points }}%"
+                                         aria-valuenow="{{ plant.growth_points }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="plant-stats">
+                                <span><i class="bi bi-chat-dots"></i> {{ plant.mood_logs|length }} logs</span>
+                                <span><i class="bi bi-bell"></i> {{ plant.reminders|length }} reminders</span>
+                            </div>
+                        </div>
+                        <div class="plant-card-footer">
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); window.location='{{ url_for('add_mood_log', plant_id=plant.id) }}'">
+                                <i class="bi bi-plus"></i> Log Mood
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); window.location='{{ url_for('plant_detail', plant_id=plant.id) }}'">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🌱</div>
+            <h3>No plants yet!</h3>
+            <p>Start your garden by adding your first plant</p>
+            <a href="{{ url_for('add_plant') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> Add Your First Plant
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Recent Activity -->
+    <div class="row mt-5">
+        <!-- Recent Moods -->
+        <div class="col-lg-6 mb-4">
+            <div class="activity-card">
+                <h3 class="activity-title">
+                    <i class="bi bi-chat-heart"></i> Recent Moods
+                </h3>
+                {% if recent_moods %}
+                    <div class="activity-list">
+                        {% for mood in recent_moods %}
+                            <div class="activity-item">
+                                <div class="activity-icon sentiment-{{ mood.sentiment_label }}">
+                                    {% if mood.sentiment_label == 'positive' %}😊
+                                    {% elif mood.sentiment_label == 'neutral' %}😐
+                                    {% else %}😔
+                                    {% endif %}
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-text">{{ mood.note_text[:60] }}{% if mood.note_text|length > 60 %}...{% endif %}</div>
+                                    <div class="activity-meta">
+                                        <span class="badge bg-{{ 'success' if mood.sentiment_label == 'positive' else 'secondary' if mood.sentiment_label == 'neutral' else 'warning' }}">
+                                            {{ mood.sentiment_label }}
+                                        </span>
+                                        <span class="text-muted">{{ mood.created_at.strftime('%b %d, %Y') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No mood logs yet. Start logging your feelings!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Upcoming Reminders -->
+        <div class="col-lg-6 mb-4">
+            <div class="activity-card">
+                <h3 class="activity-title">
+                    <i class="bi bi-alarm"></i> Upcoming Reminders
+                </h3>
+                {% if reminders %}
+                    <div class="activity-list">
+                        {% for reminder in reminders %}
+                            <div class="activity-item">
+                                <div class="activity-icon">⏰</div>
+                                <div class="activity-content">
+                                    <div class="activity-text">{{ reminder.description }}</div>
+                                    <div class="activity-meta">
+                                        <span class="text-muted">{{ reminder.reminder_date.strftime('%b %d, %Y %I:%M %p') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No upcoming reminders.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

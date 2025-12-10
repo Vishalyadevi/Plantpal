@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Login - PlantPal{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon">🌿</div>
+                        <h2>Welcome Back!</h2>
+                        <p>Login to continue your garden journey</p>
+                    </div>
+                    
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person"></i> Username
+                            </label>
+                            {{ form.username(class="form-control form-control-lg", placeholder="Enter your username") }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock"></i> Password
+                            </label>
+                            {{ form.password(class="form-control form-control-lg", placeholder="Enter your password") }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">Don't have an account? 
+                                <a href="{{ url_for('register') }}" class="text-decoration-none fw-bold">
+                                    Register here
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

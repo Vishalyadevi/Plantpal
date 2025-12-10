@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plant.name }} - PlantPal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Plant Header -->
+    <div class="plant-detail-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-link mb-2">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+                <div class="d-flex align-items-center">
+                    <div class="plant-detail-emoji">
+                        {% if plant.type == 'sunflower' %}🌻
+                        {% elif plant.type == 'rose' %}🌹
+                        {% elif plant.type == 'cactus' %}🌵
+                        {% elif plant.type == 'tulip' %}🌷
+                        {% elif plant.type == 'cherry_blossom' %}🌸
+                        {% elif plant.type == 'hibiscus' %}🌺
+                        {% elif plant.type == 'lotus' %}🪷
+                        {% else %}🌱
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h1 class="mb-1">{{ plant.name }}</h1>
+                        <p class="text-muted mb-0">Level {{ plant.level }} • {{ plant.type|replace('_', ' ')|title }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="btn-group">
+                    <a href="{{ url_for('add_mood_log', plant_id=plant.id) }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Log Mood
+                    </a>
+                    <a href="{{ url_for('edit_plant', plant_id=plant.id) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePlantModal">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Plant Progress -->
+    <div class="plant-progress-card mb-4">
+        <h4>Growth Progress</h4>
+        <div class="plant-progress-bar">
+            <div class="progress-label">
+                <span>{{ plant.growth_points }}/100 XP</span>
+                <span>Next Level: {{ 100 - plant.growth_points }} XP</span>
+            </div>
+            <div class="progress" style="height: 30px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" 
+                     style="width: {{ plant.growth_points }}%"
+                     aria-valuenow="{{ plant.growth_points }}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Mood Logs -->
+        <div class="col-lg-8 mb-4">
+            <div class="section-card">
+                <div class="section-card-header">
+                    <h3><i class="bi bi-chat-dots"></i> Mood Logs</h3>
+                    <a href="{{ url_for('add_mood_log', plant_id=plant.id) }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Add
+                    </a>
+                </div>
+                <div class="section-card-body">
+                    {% if mood_logs %}
+                        <div class="mood-logs-list">
+                            {% for log in mood_logs %}
+                                <div class="mood-log-item">
+                                    <div class="mood-log-icon sentiment-{{ log.sentiment_label }}">
+                                        {% if log.sentiment_label == 'positive' %}😊
+                                        {% elif log.sentiment_label == 'neutral' %}😐
+                                        {% else %}😔
+                                        {% endif %}
+                                    </div>
+                                    <div class="mood-log-content">
+                                        <div class="mood-log-text">{{ log.note_text }}</div>
+                                        <div class="mood-log-meta">
+                                            <span class="badge bg-{{ 'success' if log.sentiment_label == 'positive' else 'secondary' if log.sentiment_label == 'neutral' else 'warning' }}">
+                                                {{ log.sentiment_label|upper }}
+                                            </span>
+                                            <span class="text-muted">{{ log.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                                            <span class="badge bg-info">Score: {{ "%.2f"|format(log.sentiment_score) }}</span>
+                                        </div>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('delete_mood', mood_id=log.id) }}" class="d-inline" onsubmit="return confirm('Delete this mood log?');">
+                                        <button type="submit" class="btn btn-sm btn-link text-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state-small">
+                            <p>No mood logs yet. Start logging your feelings!</p>
+                            <a href="{{ url_for('add_mood_log', plant_id=plant.id) }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Add First Log
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Reminders -->
+        <div class="col-lg-4 mb-4">
+            <div class="section-card">
+                <div class="section-card-header">
+                    <h3><i class="bi bi-bell"></i> Reminders</h3>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addReminderModal">
+                        <i class="bi bi-plus"></i> Add
+                    </button>
+                </div>
+                <div class="section-card-body">
+                    {% if reminders %}
+                        <div class="reminders-list">
+                            {% for reminder in reminders %}
+                                <div class="reminder-item {% if reminder.completed %}completed{% endif %}">
+                                    <div class="reminder-content">
+                                        <div class="reminder-text">{{ reminder.description }}</div>
+                                        <div class="reminder-date">
+                                            <i class="bi bi-calendar"></i> {{ reminder.reminder_date.strftime('%b %d, %Y %I:%M %p') }}
+                                        </div>
+                                    </div>
+                                    <div class="reminder-actions">
+                                        {% if not reminder.completed %}
+                                            <button class="btn btn-sm btn-success" onclick="completeReminder({{ reminder.id }})">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        {% endif %}
+                                        <form method="POST" action="{{ url_for('delete_reminder', reminder_id=reminder.id) }}" class="d-inline" onsubmit="return confirm('Delete this reminder?');">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state-small">
+                            <p>No reminders set yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Plant Modal -->
+<div class="modal fade" id="deletePlantModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Plant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <strong>{{ plant.name }}</strong>? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" action="{{ url_for('delete_plant', plant_id=plant.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Delete Plant</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Reminder Modal -->
+<div class="modal fade" id="addReminderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Reminder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_reminder', plant_id=plant.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description" name="description" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reminder_date" class="form-label">Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="reminder_date" name="reminder_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function completeReminder(reminderId) {
+    fetch(`/reminder/${reminderId}/complete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

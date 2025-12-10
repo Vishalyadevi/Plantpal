@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Register - PlantPal{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <div class="auth-icon">🌱</div>
+                        <h2>Join PlantPal</h2>
+                        <p>Start your emotional wellness journey</p>
+                    </div>
+                    
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person"></i> Username
+                            </label>
+                            {{ form.username(class="form-control form-control-lg", placeholder="Choose a username") }}
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.username.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope"></i> Email
+                            </label>
+                            {{ form.email(class="form-control form-control-lg", placeholder="Your email address") }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.email.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock"></i> Password
+                            </label>
+                            {{ form.password(class="form-control form-control-lg", placeholder="Create a password") }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">
+                                <i class="bi bi-lock-fill"></i> Confirm Password
+                            </label>
+                            {{ form.confirm_password(class="form-control form-control-lg", placeholder="Re-enter password") }}
+                            {% if form.confirm_password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.confirm_password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus"></i> Create Account
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-0">Already have an account? 
+                                <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">
+                                    Login here
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

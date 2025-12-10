@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{% if edit %}Edit{% else %}Add{% endif %} Plant - PlantPal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>
+                        <i class="bi bi-flower1"></i> 
+                        {% if edit %}Edit Your Plant{% else %}Plant a New Seed{% endif %}
+                    </h2>
+                    <p>{% if edit %}Update your plant's details{% else %}Choose a plant to grow with your emotions{% endif %}</p>
+                </div>
+
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label for="name" class="form-label">Plant Name</label>
+                        {{ form.name(class="form-control form-control-lg", placeholder="Give your plant a name") }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Plant Type</label>
+                        <div class="plant-type-grid">
+                            {% for value, label in form.type.choices %}
+                                <div class="plant-type-option">
+                                    <input type="radio" 
+                                           class="btn-check" 
+                                           name="type" 
+                                           id="type_{{ value }}" 
+                                           value="{{ value }}"
+                                           {% if form.type.data == value %}checked{% endif %}
+                                           autocomplete="off">
+                                    <label class="btn plant-type-label" for="type_{{ value }}">
+                                        <div class="plant-type-emoji">{{ label.split()[0] }}</div>
+                                        <div class="plant-type-name">{{ label.split()[1] }}</div>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.type.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> 
+                            {% if edit %}Save Changes{% else %}Plant Seed{% endif %}
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

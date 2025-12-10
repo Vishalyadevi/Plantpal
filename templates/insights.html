@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Insights - PlantPal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="insights-header mb-4">
+        <h1><i class="bi bi-graph-up"></i> Your Emotional Insights</h1>
+        <p>Track your mood patterns and emotional well-being over time</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stat-card-large positive">
+                <div class="stat-icon">😊</div>
+                <div class="stat-content">
+                    <h3>{{ stats.positive }}</h3>
+                    <p>Positive Moods</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card-large neutral">
+                <div class="stat-icon">😐</div>
+                <div class="stat-content">
+                    <h3>{{ stats.neutral }}</h3>
+                    <p>Neutral Moods</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card-large negative">
+                <div class="stat-icon">😔</div>
+                <div class="stat-content">
+                    <h3>{{ stats.negative }}</h3>
+                    <p>Negative Moods</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stat-card-large total">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <h3>{{ stats.total }}</h3>
+                    <p>Total Logs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="bi bi-graph-up-arrow"></i> Mood Trends (Last 30 Days)
+                </h3>
+                <canvas id="moodTrendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="bi bi-pie-chart"></i> Mood Distribution
+                </h3>
+                <canvas id="moodPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Summary -->
+    <div class="summary-card mb-4">
+        <h3><i class="bi bi-calendar-week"></i> Weekly Summary</h3>
+        <div class="summary-content">
+            {% if stats.total > 0 %}
+                <p>Great job tracking your emotions! You've logged <strong>{{ stats.total }}</strong> mood entries.</p>
+                {% if stats.positive > stats.negative %}
+                    <p class="text-success">
+                        <i class="bi bi-emoji-smile"></i> Your positive moods outnumber negative ones. 
+                        Keep up the great work! 🌟
+                    </p>
+                {% elif stats.negative > stats.positive %}
+                    <p class="text-warning">
+                        <i class="bi bi-heart"></i> It looks like you've had some challenging days. 
+                        Remember to take care of yourself. 💚
+                    </p>
+                {% else %}
+                    <p class="text-info">
+                        <i class="bi bi-balance"></i> Your moods have been balanced. 
+                        Continue being mindful of your emotions.
+                    </p>
+                {% endif %}
+            {% else %}
+                <p>Start logging your moods to see insights about your emotional well-being!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-card">
+        <h3><i class="bi bi-lightbulb"></i> Tips for Emotional Well-being</h3>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="tip-item">
+                    <div class="tip-icon">🧘</div>
+                    <h5>Practice Mindfulness</h5>
+                    <p>Take a few minutes each day to meditate and be present.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="tip-item">
+                    <div class="tip-icon">✍️</div>
+                    <h5>Journal Daily</h5>
+                    <p>Regular mood logging helps you understand your emotional patterns.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="tip-item">
+                    <div class="tip-icon">🌿</div>
+                    <h5>Connect with Nature</h5>
+                    <p>Spend time outdoors to boost your mood and reduce stress.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Mood Trend Chart
+const trendCtx = document.getElementById('moodTrendChart').getContext('2d');
+const moodTrendChart = new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ mood_data.labels|tojson }},
+        datasets: [{
+            label: 'Sentiment Score',
+            data: {{ mood_data.scores|tojson }},
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    font: {
+                        family: 'Poppins',
+                        size: 12
+                    }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: {
+                    family: 'Poppins',
+                    size: 14
+                },
+                bodyFont: {
+                    family: 'Poppins',
+                    size: 12
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: -1,
+                max: 1,
+                ticks: {
+                    font: {
+                        family: 'Poppins'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            },
+            x: {
+                ticks: {
+                    font: {
+                        family: 'Poppins'
+                    }
+                },
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+
+// Mood Pie Chart
+const pieCtx = document.getElementById('moodPieChart').getContext('2d');
+const moodPieChart = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Positive', 'Neutral', 'Negative'],
+        datasets: [{
+            data: [{{ stats.positive }}, {{ stats.neutral }}, {{ stats.negative }}],
+            backgroundColor: [
+                '#10b981',
+                '#94a3b8',
+                '#fbbf24'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        family: 'Poppins',
+                        size: 12
+                    },
+                    padding: 15
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: {
+                    family: 'Poppins',
+                    size: 14
+                },
+                bodyFont: {
+                    family: 'Poppins',
+                    size: 12
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
