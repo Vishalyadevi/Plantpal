@@ -313,4 +313,4 @@ def insights():
     return render_template('insights.html', mood_data=mood_data, stats=stats)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
